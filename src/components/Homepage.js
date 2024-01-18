@@ -18,10 +18,11 @@ const LoginSchema = Yup.object().shape({
 });
 
 const AddTaskSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
+    title: Yup.string().trim().required('Title is required'),
     description: Yup.string()
         .min(10, 'Description must be at least 10 characters')
         .max(100, 'Description must be at most 100 characters')
+        .trim()
         .required('Description is required'),
 });
 
@@ -43,12 +44,9 @@ const Home = () => {
         }
     }, [viewTask]);
 
-    const handleCreateTask = () => {
-        if (title.trim() === '' || description.trim() === '') {
-            alert('Title and description are required');
-            return;
-        }
-
+    const handleCreateTask = (values) => {
+        const { title, description } = values;
+        dispatch({ type: 'TOGGLE_MODAL' });
         dispatch({
             type: 'ADD_TASK',
             payload: { title, description },
@@ -56,7 +54,6 @@ const Home = () => {
 
         setTitle('');
         setDescription('');
-        dispatch({ type: 'TOGGLE_MODAL' });
     };
 
     const handleViewTask = (task) => {
@@ -118,7 +115,7 @@ const Home = () => {
                         <Formik
                             initialValues={{ title: '', description: '' }}
                             validationSchema={AddTaskSchema}
-                            onSubmit={() => handleCreateTask()}
+                            onSubmit={(values) => handleCreateTask(values)}
                         >
                             {({ errors, touched }) => (
                                 <Form>
